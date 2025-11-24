@@ -27,6 +27,8 @@ let jugador = {
     img: mario
 };
 
+let tiempoTermino=false;
+
 // LISTA DE PAREDES
 let paredes = [
     [0, 0, W, grosor], [0, H - grosor, W, H],
@@ -139,6 +141,7 @@ function actualizarModoDestruccion() {
         modoDestruccion = false;
         jugador.img = mario;
         jugador.speed = 5;
+        tiempoTermino=true;
     }
 }
 
@@ -168,6 +171,7 @@ function loop() {
     actualizarModoDestruccion();
     draw();
     requestAnimationFrame(loop);
+    console.log(tiempoTermino)
 }
 
 loop();
