@@ -5,4 +5,5 @@ urlpatterns = [
     path('seleccion-personaje/', ListarPersonajesParaSeleccion),
     path('personaje-seleccionado/<str:nombre>/', PersonajeSeleccionado),
     path('generar—movimiento/', movimiento_personaje)
+
 ]

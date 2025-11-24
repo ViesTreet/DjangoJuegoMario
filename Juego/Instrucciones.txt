@@ -1,7 +1,0 @@
-Preferi usar una imagen en vez de un aruco para hacerlo mas agradable a la vista, tambien implemente un cambio de velocidad en el personaje para notar mas la diferencia al usar el powerup
-para ejecutar:
--instalar las importanciones
--ejecutar main.py
-
-
--Javier Ulloa Fierro

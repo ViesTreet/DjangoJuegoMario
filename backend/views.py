@@ -41,3 +41,7 @@ def movimiento_personaje(request):
 
         _, buffer = cv2.imencode('.png', imagen)
         return HttpResponse(buffer.tobytes(), content_type='image/png')
+
+
+def game_view(request):
+    return render(request, "game/index.html")
