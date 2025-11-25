@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Juego de Mario</title>
+    <style>
+        body { 
+            background: #111;
+            display: flex;
+            justify-content: center;
+            padding-top: 30px;
+        }
+        canvas {
+            background: white;
+            border: 2px solid black;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="gameCanvas" width="1000" height="500"></canvas>
+<script>
+    const personaje = "{{ personaje }}";
+</script>
+{% load static %}
+<script src="{% static 'game/js/game.js' %}"></script>
+</body>
+</html>

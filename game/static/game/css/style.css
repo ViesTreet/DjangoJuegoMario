@@ -1,0 +1,19 @@
+#mariohuano:hover{
+    background-color: rgb(190, 0, 0);
+}
+#mariohuano:hover h3{
+    color: whitesmoke;
+}
+#mariohuano:hover p{
+    color: whitesmoke;
+}
+
+#bananza:hover{
+    background-color: rgb(146, 54, 0);
+}
+#bananza:hover h3{
+    color: whitesmoke;
+}
+#bananza:hover p{
+    color: whitesmoke;
+}

@@ -18,12 +18,13 @@ from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
 from django.urls import include, path
-from game.views import game_view
+from game.views import game_view, selector
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('backend.urls')),
-    path('game/', game_view, name='game'),
+    path('game/', selector, name='game'),
+    path('game/<str:personaje>/', game_view, name='game')
 ]
 
 if settings.DEBUG:

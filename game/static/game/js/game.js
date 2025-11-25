@@ -8,14 +8,15 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 // IMÁGENES
+
+
 const mario = new Image();
-mario.src = "/static/game/img/mario.png";
-
+mario.src = `/static/game/img/${personaje}.png`;
 const marioHigh = new Image();
-marioHigh.src = "/static/game/img/mariohigh.png";
-
+marioHigh.src = `/static/game/img/${personaje}high.png`;
 const hongoImg = new Image();
 hongoImg.src = "/static/game/img/Mushroom.png";
+
 
 // JUGADOR
 let jugador = {
@@ -164,14 +165,59 @@ function draw() {
     ctx.drawImage(jugador.img, jugador.x, jugador.y, jugador.w, jugador.h);
 }
 
+
+function reiniciarMapa() {
+    // Reiniciar jugador
+    jugador.x = 50;
+    jugador.y = 50;
+    jugador.img = mario;
+    jugador.speed = 5;
+
+    // Reiniciar paredes
+    paredes = [
+        [0, 0, W, grosor], [0, H - grosor, W, H],
+        [0, 0, grosor, H], [W - grosor, 0, W, H],
+        [200, 100, 800, 105],
+        [300, 400, 800, 405],
+        [100, 0, 105, 400],
+        [200, 100, 205, 500],
+        [800, 100, 805, 300],
+        [300, 100, 305, 300],
+        [900, 0, 905, 100],
+        [900, 200, 905, 400],
+        [800, 200, 900, 205],
+        [800, 400, 900, 405],
+        [300, 250, 600, 255],
+        [600, 300, 700, 305],
+        [600, 200, 605, 300],
+        [700, 200, 705, 300]
+    ];
+
+    // Reiniciar hongo
+    hongo = { x1: 350, y1: 150, w: 50, h: 50, vivo: true };
+
+    // Reiniciar flags
+    modoDestruccion = false;
+    tiempoDestruir = Math.floor(Math.random() * 5) + 3;
+    tiempoInicio = 0;
+    tiempoTermino = false;
+}
+
+
 // LOOP PRINCIPAL
+
 function loop() {
     moverJugador();
     verificarHongo();
     actualizarModoDestruccion();
+
+    if (tiempoTermino) {
+        reiniciarMapa();
+    }
+
     draw();
     requestAnimationFrame(loop);
-    console.log(tiempoTermino)
 }
+
 
 loop();
