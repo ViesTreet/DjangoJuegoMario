@@ -23,7 +23,7 @@ from game.views import game_view, selector
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('backend.urls')),
-    path('game/', selector, name='game'),
+    path('game/', selector, name='game_selector'),
     path('game/<str:personaje>/', game_view, name='game')
 ]
 

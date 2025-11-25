@@ -10,10 +10,10 @@ const ctx = canvas.getContext("2d");
 // IMÁGENES
 
 
-const mario = new Image();
-mario.src = `/static/game/img/${personaje}.png`;
-const marioHigh = new Image();
-marioHigh.src = `/static/game/img/${personaje}high.png`;
+const personaje = new Image();
+personaje.src = `/static/game/img/${personajeNombre}.png`;
+const personajeHigh = new Image();
+personajeHigh.src = `/static/game/img/${personajeNombre}high.png`;
 const hongoImg = new Image();
 hongoImg.src = "/static/game/img/Mushroom.png";
 
@@ -24,8 +24,8 @@ let jugador = {
     y: 50,
     w: 40,
     h: 40,
-    speed: 5,
-    img: mario
+    speed: 3,
+    img: personaje
 };
 
 let tiempoTermino=false;
@@ -57,7 +57,12 @@ let hongo = { x1: 350, y1: 150, w: 50, h: 50, vivo: true };
 let modoDestruccion = false;
 let tiempoDestruir = Math.floor(Math.random() * 5) + 3; // 3–7 s
 let tiempoInicio = 0;
-
+if (personajeNombre === "mario") {
+    jugador.speed = 5;
+} else {
+    tiempoDestruir += 2;
+}
+console.log(jugador.speed, tiempoDestruir);
 // INPUT DEL TECLADO
 let keys = {};
 document.addEventListener("keydown", e => keys[e.key] = true);
@@ -126,7 +131,7 @@ function verificarHongo() {
 
     if (colision(jr, hr)) {
         hongo.vivo = false;
-        jugador.img = marioHigh;
+        jugador.img = personajeHigh;
         jugador.speed = 10;
         modoDestruccion = true;
         tiempoInicio = Date.now();
@@ -140,7 +145,7 @@ function actualizarModoDestruccion() {
     let elapsed = (Date.now() - tiempoInicio) / 1000;
     if (elapsed >= tiempoDestruir) {
         modoDestruccion = false;
-        jugador.img = mario;
+        jugador.img = personaje;
         jugador.speed = 5;
         tiempoTermino=true;
     }
@@ -170,7 +175,7 @@ function reiniciarMapa() {
     // Reiniciar jugador
     jugador.x = 50;
     jugador.y = 50;
-    jugador.img = mario;
+    jugador.img = personaje;
     jugador.speed = 5;
 
     // Reiniciar paredes
