@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,19 +12,22 @@
             padding-top: 30px;
         }
         canvas {
-            background: white;
+            background-image: url("{% static 'game/img/sky.jpeg' %}");
             border: 2px solid black;
+            background-size: cover;
+            background-position: center;
         }
     </style>
 </head>
 <body>
 
 <canvas id="gameCanvas" width="1000" height="500"></canvas>
+
 <script>
     const personajeNombre = "{{ personajeNombre }}";
     console.log(personajeNombre)
 </script>
-{% load static %}
+
 <script src="{% static 'game/js/game.js' %}"></script>
 </body>
 </html>
