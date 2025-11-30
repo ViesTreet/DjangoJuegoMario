@@ -1,10 +1,11 @@
 //config iniciales
-const W = 1000;
+const W = 1200;
 const H = 500;
 const grosor = 5;
 
 //lienzo
 const canvas = document.getElementById("gameCanvas");
+
 const ctx = canvas.getContext("2d");
 
 //recursos
@@ -14,97 +15,154 @@ const personajeHigh = new Image();
 personajeHigh.src = `/static/game/img/${personajeNombre}high.png`;
 const hongoImg = new Image();
 hongoImg.src = "/static/game/img/Mushroom.png";
-
-//objeto jugador
+let spawnX = 50;
+let spawnY = 300;
+let mapaN=1;
 let jugador = {
-    x: 50,
-    y: 50,
-    w: 40,
-    h: 40,
-    speed: 5,
+    x: spawnX,
+    y: spawnY,
+    w: 30,
+    h: 30,
+    speed: 4,
     img: personaje,
     velY: 0,        
     salto: false,   
-    fuerzaSalto: -15, 
+    fuerzaSalto: -12, 
     gravedad: 0.8,  
     enSuelo: false  
 };
 
 let tiempoTermino = false;
-
+//alert("Ingresa por la puerta cafe para cambiar de seccion.")
+//alert("Consume el hongo para matar enemigos.")
 //mapas
-const mapa1 = [
-    
-    [0, 0, W, grosor], 
+const mapa1 = [[
+    //paredes externas y puerta
+        [0, H - grosor, W, H], 
+        [0, 0, grosor, H], 
+        [W - grosor, 0, W, H-100],
+        [W - grosor, H-100, W, H],
+
+
+        [0,450,200,500],
+        [200,400,400,500],
+        [500,400,600,500],
+        [600,350,650,500],
+        [650,300,700,500],
+        [700,250,750,500],
+        [700,250,750,500],
+        [750,200,800,500],
+        [800,200,1100,210],
+        [900,300,1200,400],
+        [800,495,1200,500]
+    ]
+    ,
+    [
+        [400,450,500,500]
+    ]
+];
+
+const mapa2 = [[
+    //paredes externas y puerta
     [0, H - grosor, W, H], 
-    
-    
     [0, 0, grosor, H], 
-    [W - grosor, 0, W, H],
-    
-    
-    [200, 400, 800, 405], 
-    [100, 300, 300, 305], 
-    [600, 300, 900, 305], 
-    [400, 200, 600, 205], 
-    [100, 150, 250, 155], 
-    [700, 150, 850, 155]  
-];
+    [W - grosor, 0, W, H-100],
+    [W - grosor, H-100, W, H],
 
-const mapa2 = [
-    
-    [0, 0, W, grosor], 
-    [0, H - grosor, W, H],
-    
-    
+    // plataformas tipo parkour (bloques gruesos y delgados)
+    [0, 420, 180, 500],
+    [220, 360, 320, 380],
+    [360, 300, 440, 320],
+    [480, 240, 560, 260],
+    [620, 200, 700, 220],
+    [760, 260, 830, 500],
+    [990, 320, 1200, 340],
+    [830, 420, 1100, 430],
+    [830,495,1200,500]
+
+],
+// lava: hoyos con lava (coordenadas pensadas para que el pj caiga si se equivoca)
+[
+    [180,450,760,500]
+]];
+
+const mapa3 = [[
+    //paredes externas y puerta
+    [0, H - grosor, W, H], 
     [0, 0, grosor, H], 
-    [W - grosor, 0, W, H],
-    
-    
-    [100, 400, 300, 405],
-    [300, 350, 500, 355],
-    [500, 300, 700, 305],
-    [700, 250, 900, 255],
-    
-    
-    [150, 200, 350, 205],
-    [450, 150, 650, 155],
-    [750, 100, 950, 105],
-    
-    
-    [400, 400, 450, 300]
-];
+    [W - grosor, 0, W, H-100],
+    [W - grosor, H-100, W, H],
 
-const mapa3 = [
-    
-    [0, 0, W, grosor], 
-    [0, H - grosor, W, H],
-    
-    
+    // laberinto horizontal con pasillos y plataformas estrechas
+    [0, 420, 140, 500],
+    [140, 360, 260, 380],
+    [260, 300, 380, 320],
+    [380, 240, 500, 260],
+    [500, 180, 620, 200],
+    [620, 240, 740, 260],
+    [740, 300, 860, 320],
+    [860, 360, 980, 500],
+    [980, 495, 1200, 500]
+],
+[
+    // lava en huecos del laberinto (trampas)
+    [140, 450, 860, 500]
+]];
+
+const mapa4 = [[
+    //paredes externas y puerta
+    [0, H - grosor, W, H], 
     [0, 0, grosor, H], 
-    [W - grosor, 0, W, H],
-    
-    
-    [100, 400, 400, 405],
-    [550, 400, 900, 405],
-    
-    
-    [200, 300, 350, 305],
-    [450, 300, 600, 305],
-    [700, 300, 850, 305],
-    
-    
-    [100, 200, 150, 400],
-    [850, 200, 900, 400],
-    
-    
-    [150, 150, 300, 155],
-    [350, 100, 500, 105],
-    [600, 150, 750, 155]
-];
+    [W - grosor, 0, W, H-100],
+    [W - grosor, H-100, W, H],
+    // zigzag vertical / escalera de plataformas (parkour de precisión)
+    [0, 440, 120, 500],
+    [160, 400, 260, 420],
+    [300, 360, 380, 380],
+    [420, 320, 500, 340],
+    [540, 280, 620, 300],
+    [660, 240, 740, 500],
+    [800, 200, 860, 300],
+    [950, 160, 1200, 400],
+    [740, 495, 1200, 500]
+],
+[
+    // lava en los huecos entre escalones
+    [120,460,660,500]
+]];
+
+const mapa5 = [[
+    //paredes externas y puerta
+    [0, H - grosor, W, H], 
+    [0, 0, grosor, H], 
+    [W - grosor, 0, W, H-100],
+    [W - grosor, H-100, W, H],
+
+    // mezcla: plataformas anchas, huecos grandes, y un mini-laberinto final
+    [0, 440, 200, 500],
+    [240, 380, 420, 400],
+    [460, 320, 620, 500],
+    [660, 380, 820, 400],
+    [860, 300, 980, 500],
+    [860, 300, 1120, 320],
+    [980,495,1200,500],
+    // pasillo final con plataformas estrechas
+    [740, 220, 770, 240],
+    [780, 160, 820, 180],
+    [840, 120, 880, 140],
+    [1020, 120, 1200, 140]
+],
+[
+    // lava: grandes hoyos y un tramo continuo
+    [200, 460, 460, 500],
+    [620, 400, 860, 500]
+
+]];
 
 
-let hongo = { x1: 400, y1: 150, w: 50, h: 50, vivo: true };
+
+
+let hongo = { x1: 400, y1: 150, w: 50, h: 50, vivo: false };
 
 //variables iniciales
 let modoDestruccion = false;
@@ -113,7 +171,6 @@ let tiempoInicio = 0;
 
 if (personajeNombre === "mario") {
     jugador.speed = 5;
-    jugador.fuerzaSalto = -18; 
 } else {
     tiempoDestruir += 2;
 }
@@ -153,9 +210,11 @@ function detectarColisionLados(rect, prect) {
         return 'abajo';
     }
     
-    if ((rect.x2 >= prect.x1 && rect.x1 < prect.x1) ||
-        (rect.x1 <= prect.x2 && rect.x2 > prect.x2)) {
-        return 'lateral';
+    if (rect.x2 >= prect.x1 && rect.x1 < prect.x1) {
+        return 'lateralDer'; 
+    }
+    if (rect.x1 <= prect.x2 && rect.x2 > prect.x2) {
+        return 'lateralIzq'; 
     }
     
     return null;
@@ -163,7 +222,7 @@ function detectarColisionLados(rect, prect) {
 
 
 
-function moverJugador(paredes) {
+function moverJugador(paredes,irrompible) {
     let oldX = jugador.x;
     let oldY = jugador.y;
 
@@ -183,56 +242,67 @@ function moverJugador(paredes) {
         x2: jugador.x + jugador.w, y2: jugador.y + jugador.h
     };
 
-    
     for (let p of paredes) {
         let prect = { x1: p[0], y1: p[1], x2: p[2], y2: p[3] };
+        let puerta= {x1: paredes[3][0], y1: paredes[3][1], x2: paredes[3][2], y2: paredes[3][3]};
         if (colision(rect, prect)) {
             const lado = detectarColisionLados(rect, prect);
-            
-            if (lado === 'arriba') {
-                
-                jugador.y = prect.y1 - jugador.h;
-                jugador.velY = 0;
-                jugador.enSuelo = true;
-                jugador.salto = false;
-            } else if (lado === 'abajo') {
-                
-                jugador.y = prect.y2;
-                jugador.velY = 0;
-            } else if (lado === 'lateral') {
-                
-                jugador.x = oldX;
+            if (
+                prect.x1 === puerta.x1 &&
+                prect.y1 === puerta.y1 &&
+                prect.x2 === puerta.x2 &&
+                prect.y2 === puerta.y2
+            ){
+                mapaN++;
+                cambiarMapa(mapaN);
+                return;
+            }else{
+                if (lado === 'arriba') {
+
+                    jugador.y = prect.y1 - jugador.h;
+                    jugador.velY = 0;
+                    jugador.enSuelo = true;
+                    jugador.salto = false;
+                } else if (lado === 'abajo') {
+
+                    jugador.y = prect.y2;
+                    jugador.velY = 0;
+                } else if (lado === 'lateralDer') {
+
+                    jugador.x = oldX-5;
+                }else if(lado === 'lateralIzq'){
+                    jugador.x = oldX+5;
+                }
             }
         }
     }
 
-    
+    /*
     if (modoDestruccion) {
         for (let i = paredes.length - 1; i >= 0; i--) {
             let p = paredes[i];
             let prect = { x1: p[0], y1: p[1], x2: p[2], y2: p[3] };
             
             
-            if (colision(rect, prect) && i > 3) {
+            if (colision(rect, prect) && i > irrompible) {
                 paredes.splice(i, 1);
                 break; 
             }
         }
     }
 
-    
+    */
     if (jugador.velY > 20) jugador.velY = 20;
 
     
-    if (jugador.x < 0) jugador.x = 0;
+    if (jugador.x < 0) reiniciarJugador();
     if (jugador.x + jugador.w > W) jugador.x = W - jugador.w;
 
     
     if (jugador.y > H) {
-        jugador.x = 50;
-        jugador.y = 50;
-        jugador.velY = 0;
+        reiniciarJugador();
     }
+
 }
 
 
@@ -260,7 +330,7 @@ function verificarHongo() {
         modoDestruccion = true;
         tiempoInicio = Date.now();
         
-        jugador.fuerzaSalto = -25;
+        jugador.fuerzaSalto = -15;
         jugador.gravedad = 0.6;
     }
 }
@@ -283,11 +353,22 @@ function actualizarModoDestruccion() {
 
 function draw(paredes) {
     ctx.clearRect(0, 0, W, H);
-
     
-    ctx.fillStyle = "black";
-    for (let p of paredes) {
+    for (let p of paredes[0]) {
+        if(p==paredes[0][3]){
+            ctx.fillStyle = "brown";
+        }
+        else if(p==paredes[0][0] || p==paredes[0][1] || p==paredes[0][2]){
+            ctx.fillStyle = "rgba(0,0,0,0)";
+        }
+        else{
+            ctx.fillStyle = "green";
+        }
         ctx.fillRect(p[0], p[1], p[2] - p[0], p[3] - p[1]);
+    }
+    for (let d of paredes[1]) {
+        ctx.fillStyle = "rgba(234, 1, 1, 0.9)";
+        ctx.fillRect(d[0], d[1], d[2] - d[0], d[3] - d[1]);
     }
 
     
@@ -300,9 +381,8 @@ function draw(paredes) {
 }
 
 function reiniciarMapa() {
-    
-    jugador.x = 50;
-    jugador.y = 50;
+    jugador.x = spawnX;
+    jugador.y = spawnY;
     jugador.velY = 0;
     jugador.img = personaje;
     jugador.speed = 5;
@@ -311,13 +391,8 @@ function reiniciarMapa() {
     jugador.enSuelo = false;
     jugador.salto = false;
 
-    
-    paredes = [...mapa1];
-
-    
     hongo = { x1: 400, y1: 150, w: 50, h: 50, vivo: true };
 
-    
     modoDestruccion = false;
     tiempoDestruir = Math.floor(Math.random() * 5) + 3;
     tiempoInicio = 0;
@@ -328,40 +403,66 @@ function reiniciarMapa() {
 let paredesActuales = [...mapa1]; 
 // funcion loop
 function loop() {
-    moverJugador(paredesActuales);
+    moverJugador(paredesActuales[0],3);
     verificarHongo();
     actualizarModoDestruccion();
-
-    if (tiempoTermino) {
-        reiniciarMapa();
-        paredesActuales = [...mapa1]; 
-    }
 
     draw(paredesActuales);
     requestAnimationFrame(loop);
 }
 
+function reiniciarJugador() {
+    jugador.x = spawnX; // spawnX definido al cambiar de mapa
+    jugador.y = spawnY; // spawnY definido al cambiar de mapa
+    jugador.velY = 0;
+    jugador.enSuelo = false;
+    jugador.salto = false;
+}
 
 function cambiarMapa(numeroMapa) {
     switch(numeroMapa) {
         case 1:
             paredesActuales = [...mapa1];
-            hongo = { x1: 400, y1: 150, w: 50, h: 50, vivo: true };
+            hongo = { x1: 400, y1: 150, w: 50, h: 50, vivo: false };
+            spawnX = 50; spawnY = 300;
+            reiniciarJugador();
             break;
         case 2:
             paredesActuales = [...mapa2];
-            hongo = { x1: 800, y1: 80, w: 50, h: 50, vivo: true };
+            hongo = { x1: 1100, y1: 280, w: 50, h: 50, vivo: false };
+            spawnX = 20; spawnY = 350;
+            reiniciarJugador();
             break;
         case 3:
             paredesActuales = [...mapa3];
-            hongo = { x1: 450, y1: 80, w: 50, h: 50, vivo: true };
+            hongo = { x1: 520, y1: 140, w: 50, h: 50, vivo: false };
+            spawnX = 30; spawnY = 350;
+            reiniciarJugador();
+            break;
+        case 4:
+            paredesActuales = [...mapa4];
+            hongo = { x1: 1100, y1: 120, w: 50, h: 50, vivo: false };
+            spawnX = 40; spawnY = 350;
+            reiniciarJugador();
+            break;
+        case 5:
+            paredesActuales = [...mapa5];
+            hongo = { x1: 1150, y1: 80, w: 50, h: 50, vivo: false };
+            spawnX = 10; spawnY = 400;
+            reiniciarJugador();
+            break;
+        default:
+            paredesActuales = [...mapa1];
+            hongo = { x1: 400, y1: 150, w: 50, h: 50, vivo: false };
+            spawnX = 50; spawnY = 300;
+            mapaN = 1;
+            reiniciarJugador();
             break;
     }
-    jugador.x = 50;
-    jugador.y = 50;
     jugador.velY = 0;
+    jugador.enSuelo = false;
+    jugador.salto = false;
+    
+    
 }
-
-
-cambiarMapa(3);
 loop();

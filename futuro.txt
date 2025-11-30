@@ -1,0 +1,1 @@
+Activar hongos, cambiar funcionamiento hongos, eliminar funcion destruir , borrar funcion reiniciar mapa talvez, etc
