@@ -15,6 +15,8 @@ const personajeHigh = new Image();
 personajeHigh.src = `/static/game/img/${personajeNombre}high.png`;
 const hongoImg = new Image();
 hongoImg.src = "/static/game/img/Mushroom.png";
+const enemy = new Image();
+enemy.src = "/static/game/img/enemy.png";
 let spawnX = 50;
 let spawnY = 300;
 let mapaN=1;
@@ -31,6 +33,7 @@ let jugador = {
     gravedad: 0.8,  
     enSuelo: false  
 };
+let enemigos = [];
 
 let tiempoTermino = false;
 //alert("Ingresa por la puerta cafe para cambiar de seccion.")
@@ -220,8 +223,6 @@ function detectarColisionLados(rect, prect) {
     return null;
 }
 
-
-
 function moverJugador(paredes,irrompible) {
     let oldX = jugador.x;
     let oldY = jugador.y;
@@ -406,10 +407,72 @@ function loop() {
     moverJugador(paredesActuales[0],3);
     verificarHongo();
     actualizarModoDestruccion();
-
+    actualizarEnemigos(); 
     draw(paredesActuales);
+    dibujarEnemigos(); 
+    limpiarEnemigosMuertos();
     requestAnimationFrame(loop);
 }
+
+function actualizarEnemigos() {
+    if (!enemigos || enemigos.length === 0) return;
+
+    for (let en of enemigos) {
+        if (!en.vivo) continue;
+
+        // Mover según dirección
+        en.x += en.speed * en.dir;
+
+        // Si llegó al extremo derecho: cambiar dirección a izquierda
+        if (en.x >= en.x0 + en.mov) {
+            en.dir = -1;
+        }
+
+        // Si llegó al extremo izquierdo: cambiar dirección a derecha
+        if (en.x <= en.x0) {
+            en.dir = 1;
+        }
+
+        // --- Detectar colisión con jugador ---
+        let jr = { x1: jugador.x, y1: jugador.y, x2: jugador.x + jugador.w, y2: jugador.y + jugador.h };
+        let er = { x1: en.x, y1: en.y, x2: en.x + en.w, y2: en.y + en.h };
+
+        if (colision(jr, er) && en.vivo) {
+
+            const stompMargin = 6;
+            const jugadorBottom = jugador.y + jugador.h;
+
+            // Stomp si viene cayendo de arriba
+            if (jugadorBottom <= en.y + stompMargin && jugador.velY > 0) {
+                en.vivo = false;
+                jugador.velY = jugador.fuerzaSalto / 2;
+                jugador.enSuelo = false;
+            } else {
+                reiniciarJugador();
+            }
+        }
+    }
+}
+
+
+function limpiarEnemigosMuertos() {
+    enemigos = enemigos.filter(e => e.vivo);
+}
+
+// dibujar enemigos
+function dibujarEnemigos() {
+    if (!enemigos || enemigos.length === 0) return;
+    for (let en of enemigos) {
+        if (!en.vivo) continue;
+        ctx.drawImage(en.img, en.x, en.y, en.w, en.h);
+    }
+}
+
+// opcional: limpiar enemigos muertos (si no quieres que queden en la lista)
+function limpiarEnemigosMuertos() {
+    enemigos = enemigos.filter(e => e.vivo);
+}
+
 
 function reiniciarJugador() {
     jugador.x = spawnX; // spawnX definido al cambiar de mapa
@@ -425,36 +488,55 @@ function cambiarMapa(numeroMapa) {
             paredesActuales = [...mapa1];
             hongo = { x1: 400, y1: 150, w: 50, h: 50, vivo: false };
             spawnX = 50; spawnY = 300;
+            // Ejemplo: enemigo en x0=600, y=370, se mueve 80px a la derecha y vuelve a x0
+            enemigos = [
+                { x0: 600, x: 600, y: 370, w: 30, h: 30, img: enemy, mov: 80, vivo: true, speed: 1,dir: 1 }
+            ];
             reiniciarJugador();
             break;
         case 2:
             paredesActuales = [...mapa2];
             hongo = { x1: 1100, y1: 280, w: 50, h: 50, vivo: false };
             spawnX = 20; spawnY = 350;
+            // varios enemigos ejemplo
+            enemigos = [
+                { x0: 300, x: 300, y: 460-30, w: 30, h: 30, img: enemy, mov: 120, vivo: true, speed: 1,dir: 1 },
+                { x0: 800, x: 800, y: 300, w: 30, h: 30, img: enemy, mov: 50, vivo: true, speed: 1,dir: 1 }
+            ];
             reiniciarJugador();
             break;
         case 3:
             paredesActuales = [...mapa3];
             hongo = { x1: 520, y1: 140, w: 50, h: 50, vivo: false };
             spawnX = 30; spawnY = 350;
+            enemigos = [
+                { x0: 500, x: 500, y: 260-30, w: 30, h: 30, img: enemy, mov: 200, vivo: true, speed: 2,dir: 1 }
+            ];
             reiniciarJugador();
             break;
         case 4:
             paredesActuales = [...mapa4];
             hongo = { x1: 1100, y1: 120, w: 50, h: 50, vivo: false };
             spawnX = 40; spawnY = 350;
+            enemigos = [
+                { x0: 200, x: 200, y: 480-30, w: 30, h: 30, img: enemy, mov: 100, vivo: true, speed: 1,dir: 1 }
+            ];
             reiniciarJugador();
             break;
         case 5:
             paredesActuales = [...mapa5];
             hongo = { x1: 1150, y1: 80, w: 50, h: 50, vivo: false };
             spawnX = 10; spawnY = 400;
+            enemigos = [
+                { x0: 700, x: 700, y: 220-30, w: 30, h: 30, img: enemy, mov: 60, vivo: true, speed: 1,dir: 1 }
+            ];
             reiniciarJugador();
             break;
         default:
             paredesActuales = [...mapa1];
             hongo = { x1: 400, y1: 150, w: 50, h: 50, vivo: false };
             spawnX = 50; spawnY = 300;
+            enemigos = [];
             mapaN = 1;
             reiniciarJugador();
             break;
@@ -462,7 +544,5 @@ function cambiarMapa(numeroMapa) {
     jugador.velY = 0;
     jugador.enSuelo = false;
     jugador.salto = false;
-    
-    
 }
 loop();
