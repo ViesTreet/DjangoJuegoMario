@@ -31,7 +31,8 @@ let jugador = {
     salto: false,   
     fuerzaSalto: -12, 
     gravedad: 0.8,  
-    enSuelo: false  
+    enSuelo: false,
+    vidas: 3  
 };
 let enemigos = [];
 
@@ -223,7 +224,7 @@ function detectarColisionLados(rect, prect) {
     return null;
 }
 
-function moverJugador(paredes,irrompible) {
+function moverJugador(paredes,irrompible,lava) {
     let oldX = jugador.x;
     let oldY = jugador.y;
 
@@ -277,7 +278,16 @@ function moverJugador(paredes,irrompible) {
             }
         }
     }
-
+    for (let l of lava){
+        let prect = { x1: l[0], y1: l[1], x2: l[2], y2: l[3] };
+        if (colision(rect, prect)) {
+            const lado = detectarColisionLados(rect, prect);
+            if (lado != null){
+                jugador.vidas -=1;
+                reiniciarJugador();
+            }
+        }   
+    }
     /*
     if (modoDestruccion) {
         for (let i = paredes.length - 1; i >= 0; i--) {
@@ -382,29 +392,36 @@ function draw(paredes) {
 }
 
 function reiniciarMapa() {
-    jugador.x = spawnX;
-    jugador.y = spawnY;
+    jugador.x = 50;
+    jugador.y = 300;
     jugador.velY = 0;
     jugador.img = personaje;
-    jugador.speed = 5;
-    jugador.fuerzaSalto = personajeNombre === "mario" ? -18 : -15;
+    jugador.speed = 4;
+    jugador.fuerzaSalto = -12;
     jugador.gravedad = 0.8;
     jugador.enSuelo = false;
     jugador.salto = false;
+    jugador.vidas =3;
 
-    hongo = { x1: 400, y1: 150, w: 50, h: 50, vivo: true };
 
     modoDestruccion = false;
     tiempoDestruir = Math.floor(Math.random() * 5) + 3;
     tiempoInicio = 0;
     tiempoTermino = false;
+    if (personajeNombre === "mario") {
+        jugador.speed = 5;
+    } else {
+        tiempoDestruir += 2;
+    }
+    mapaN=1;
+    cambiarMapa(mapaN);
 }
 
 
 let paredesActuales = [...mapa1]; 
 // funcion loop
 function loop() {
-    moverJugador(paredesActuales[0],3);
+    moverJugador(paredesActuales[0],3,paredesActuales[1]);
     verificarHongo();
     actualizarModoDestruccion();
     actualizarEnemigos(); 
@@ -437,17 +454,18 @@ function actualizarEnemigos() {
         let jr = { x1: jugador.x, y1: jugador.y, x2: jugador.x + jugador.w, y2: jugador.y + jugador.h };
         let er = { x1: en.x, y1: en.y, x2: en.x + en.w, y2: en.y + en.h };
 
-        if (colision(jr, er) && en.vivo) {
+        if (colision(jr, er) && en.vivo ) {
 
             const stompMargin = 6;
             const jugadorBottom = jugador.y + jugador.h;
 
             // Stomp si viene cayendo de arriba
-            if (jugadorBottom <= en.y + stompMargin && jugador.velY > 0) {
+            if (modoDestruccion) {
                 en.vivo = false;
                 jugador.velY = jugador.fuerzaSalto / 2;
                 jugador.enSuelo = false;
             } else {
+                jugador.vidas -= 1;
                 reiniciarJugador();
             }
         }
@@ -475,6 +493,9 @@ function limpiarEnemigosMuertos() {
 
 
 function reiniciarJugador() {
+    if(jugador.vidas == 0){
+        reiniciarMapa();
+    }
     jugador.x = spawnX; // spawnX definido al cambiar de mapa
     jugador.y = spawnY; // spawnY definido al cambiar de mapa
     jugador.velY = 0;
@@ -488,9 +509,8 @@ function cambiarMapa(numeroMapa) {
             paredesActuales = [...mapa1];
             hongo = { x1: 400, y1: 150, w: 50, h: 50, vivo: false };
             spawnX = 50; spawnY = 300;
-            // Ejemplo: enemigo en x0=600, y=370, se mueve 80px a la derecha y vuelve a x0
             enemigos = [
-                { x0: 600, x: 600, y: 370, w: 30, h: 30, img: enemy, mov: 80, vivo: true, speed: 1,dir: 1 }
+                { x0: 900, x: 900, y: 300-30, w: 30, h: 30, img: enemy, mov: 200, vivo: true, speed: 1,dir: 1 }
             ];
             reiniciarJugador();
             break;
@@ -498,10 +518,9 @@ function cambiarMapa(numeroMapa) {
             paredesActuales = [...mapa2];
             hongo = { x1: 1100, y1: 280, w: 50, h: 50, vivo: false };
             spawnX = 20; spawnY = 350;
-            // varios enemigos ejemplo
             enemigos = [
-                { x0: 300, x: 300, y: 460-30, w: 30, h: 30, img: enemy, mov: 120, vivo: true, speed: 1,dir: 1 },
-                { x0: 800, x: 800, y: 300, w: 30, h: 30, img: enemy, mov: 50, vivo: true, speed: 1,dir: 1 }
+                { x0: 760, x: 760, y: 260-30, w: 30, h: 30, img: enemy, mov: 50, vivo: true, speed: 1,dir: 1 },
+                { x0: 830, x: 830, y: 495-30, w: 30, h: 30, img: enemy, mov: 340, vivo: true, speed: 2,dir: 1 }
             ];
             reiniciarJugador();
             break;
@@ -510,7 +529,7 @@ function cambiarMapa(numeroMapa) {
             hongo = { x1: 520, y1: 140, w: 50, h: 50, vivo: false };
             spawnX = 30; spawnY = 350;
             enemigos = [
-                { x0: 500, x: 500, y: 260-30, w: 30, h: 30, img: enemy, mov: 200, vivo: true, speed: 2,dir: 1 }
+                { x0: 980, x: 980, y: 495-30, w: 30, h: 30, img: enemy, mov: 190, vivo: true, speed: 3,dir: 1 }
             ];
             reiniciarJugador();
             break;
@@ -519,7 +538,8 @@ function cambiarMapa(numeroMapa) {
             hongo = { x1: 1100, y1: 120, w: 50, h: 50, vivo: false };
             spawnX = 40; spawnY = 350;
             enemigos = [
-                { x0: 200, x: 200, y: 480-30, w: 30, h: 30, img: enemy, mov: 100, vivo: true, speed: 1,dir: 1 }
+                { x0: 740, x: 740, y: 495-30, w: 30, h: 30, img: enemy, mov: 400, vivo: true, speed: 3,dir: 1 },
+                { x0: 950, x: 950, y: 160-30, w: 30, h: 30, img: enemy, mov: 100, vivo: true, speed: 2,dir: 1 }
             ];
             reiniciarJugador();
             break;
@@ -528,7 +548,9 @@ function cambiarMapa(numeroMapa) {
             hongo = { x1: 1150, y1: 80, w: 50, h: 50, vivo: false };
             spawnX = 10; spawnY = 400;
             enemigos = [
-                { x0: 700, x: 700, y: 220-30, w: 30, h: 30, img: enemy, mov: 60, vivo: true, speed: 1,dir: 1 }
+                { x0: 240, x: 240, y: 380-30, w: 30, h: 30, img: enemy, mov: 140, vivo: true, speed: 1,dir: 1 },
+                { x0: 460, x: 460, y: 320-30, w: 30, h: 30, img: enemy, mov: 140, vivo: true, speed: 1.5,dir: 1 },
+                { x0: 860, x: 860, y: 300-30, w: 30, h: 30, img: enemy, mov: 250, vivo: true, speed: 3,dir: 1 }
             ];
             reiniciarJugador();
             break;
@@ -536,13 +558,17 @@ function cambiarMapa(numeroMapa) {
             paredesActuales = [...mapa1];
             hongo = { x1: 400, y1: 150, w: 50, h: 50, vivo: false };
             spawnX = 50; spawnY = 300;
-            enemigos = [];
-            mapaN = 1;
+            enemigos = [
+                { x0: 900, x: 900, y: 300-30, w: 30, h: 30, img: enemy, mov: 200, vivo: true, speed: 1,dir: 1 }
+            ];
             reiniciarJugador();
             break;
     }
     jugador.velY = 0;
     jugador.enSuelo = false;
     jugador.salto = false;
+}
+if (mapaN==1){
+    cambiarMapa(mapaN)
 }
 loop();
