@@ -507,7 +507,7 @@ function cambiarMapa(numeroMapa) {
     switch(numeroMapa) {
         case 1:
             paredesActuales = [...mapa1];
-            hongo = { x1: 400, y1: 150, w: 50, h: 50, vivo: false };
+            hongo = { x1: 400, y1: 150, w: 50, h: 50, vivo: true };
             spawnX = 50; spawnY = 300;
             enemigos = [
                 { x0: 900, x: 900, y: 300-30, w: 30, h: 30, img: enemy, mov: 200, vivo: true, speed: 1,dir: 1 }
@@ -516,7 +516,7 @@ function cambiarMapa(numeroMapa) {
             break;
         case 2:
             paredesActuales = [...mapa2];
-            hongo = { x1: 1100, y1: 280, w: 50, h: 50, vivo: false };
+            hongo = { x1: 1100, y1: 280, w: 50, h: 50, vivo: true };
             spawnX = 20; spawnY = 350;
             enemigos = [
                 { x0: 760, x: 760, y: 260-30, w: 30, h: 30, img: enemy, mov: 50, vivo: true, speed: 1,dir: 1 },
@@ -526,7 +526,7 @@ function cambiarMapa(numeroMapa) {
             break;
         case 3:
             paredesActuales = [...mapa3];
-            hongo = { x1: 520, y1: 140, w: 50, h: 50, vivo: false };
+            hongo = { x1: 520, y1: 140, w: 50, h: 50, vivo: true };
             spawnX = 30; spawnY = 350;
             enemigos = [
                 { x0: 980, x: 980, y: 495-30, w: 30, h: 30, img: enemy, mov: 190, vivo: true, speed: 3,dir: 1 }
@@ -535,7 +535,7 @@ function cambiarMapa(numeroMapa) {
             break;
         case 4:
             paredesActuales = [...mapa4];
-            hongo = { x1: 1100, y1: 120, w: 50, h: 50, vivo: false };
+            hongo = { x1: 1100, y1: 120, w: 50, h: 50, vivo: true };
             spawnX = 40; spawnY = 350;
             enemigos = [
                 { x0: 740, x: 740, y: 495-30, w: 30, h: 30, img: enemy, mov: 400, vivo: true, speed: 3,dir: 1 },
@@ -545,7 +545,7 @@ function cambiarMapa(numeroMapa) {
             break;
         case 5:
             paredesActuales = [...mapa5];
-            hongo = { x1: 1150, y1: 80, w: 50, h: 50, vivo: false };
+            hongo = { x1: 1150, y1: 80, w: 50, h: 50, vivo: true };
             spawnX = 10; spawnY = 400;
             enemigos = [
                 { x0: 240, x: 240, y: 380-30, w: 30, h: 30, img: enemy, mov: 140, vivo: true, speed: 1,dir: 1 },
@@ -556,7 +556,7 @@ function cambiarMapa(numeroMapa) {
             break;
         default:
             paredesActuales = [...mapa1];
-            hongo = { x1: 400, y1: 150, w: 50, h: 50, vivo: false };
+            hongo = { x1: 400, y1: 150, w: 50, h: 50, vivo: true };
             spawnX = 50; spawnY = 300;
             enemigos = [
                 { x0: 900, x: 900, y: 300-30, w: 30, h: 30, img: enemy, mov: 200, vivo: true, speed: 1,dir: 1 }
