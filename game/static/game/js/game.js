@@ -7,8 +7,15 @@ const grosor = 5;
 const canvas = document.getElementById("gameCanvas");
 
 const ctx = canvas.getContext("2d");
-
+const salto = new Audio("/static/game/audio/salto.mp3");
+const good = new Audio("/static/game/audio/good.mp3");
+const dead = new Audio("/static/game/audio/dead.mp3");
+const kill = new Audio("/static/game/audio/kill.mp3");
 //recursos
+let flag=false;
+const musicaFondo = new Audio("/static/game/audio/back.mp3");
+musicaFondo.loop = true;      
+musicaFondo.volume = 0.4;     
 const personaje = new Image();
 personaje.src = `/static/game/img/${personajeNombre}.png`;
 const personajeHigh = new Image();
@@ -39,8 +46,8 @@ let jugador = {
 let enemigos = [];
 
 let tiempoTermino = false;
-//alert("Ingresa por la puerta cafe para cambiar de seccion.")
-//alert("Consume el hongo para matar enemigos.")
+alert("Ingresa por la puerta cafe para cambiar de seccion.")
+alert("Consume el hongo para matar enemigos y cuidado con la lava.")
 //mapas
 const mapa1 = [[
     //paredes externas y puerta
@@ -189,6 +196,8 @@ document.addEventListener("keydown", function(e) {
     if ((e.key === " " || e.key === "ArrowUp") && jugador.enSuelo) {
         jugador.velY = jugador.fuerzaSalto;
         jugador.salto = true;
+        salto.currentTime=0;
+        salto.play();
         jugador.enSuelo = false;
     }
 });
@@ -286,6 +295,8 @@ function moverJugador(paredes,irrompible,lava) {
             const lado = detectarColisionLados(rect, prect);
             if (lado != null){
                 if(!modoDestruccion){
+                    dead.currentTime=0;
+                    dead.play();
                     jugador.vidas -=1;
                 }
                 reiniciarJugador();
@@ -344,7 +355,8 @@ function verificarHongo() {
         jugador.speed +=2;
         modoDestruccion = true;
         tiempoInicio = Date.now();
-        
+        kill.currentTime=0;
+        kill.play();
         jugador.fuerzaSalto -=2;
         jugador.gravedad = 0.8;
         vidasLogo.src = "/static/game/img/vidagold.png";
@@ -478,7 +490,11 @@ function actualizarEnemigos() {
                 en.vivo = false;
                 jugador.velY = jugador.fuerzaSalto / 2;
                 jugador.enSuelo = false;
+                kill.currentTime=0;
+                kill.play();
             } else {
+                dead.currentTime=0;
+                dead.play();
                 jugador.vidas -= 1;
                 reiniciarJugador();
             }
@@ -575,6 +591,8 @@ function cambiarMapa(numeroMapa) {
             enemigos = [
                 { x0: 900, x: 900, y: 300-30, w: 30, h: 30, img: enemy, mov: 200, vivo: true, speed: 1,dir: 1 }
             ];
+            flag=true;
+            window.addEventListener("keydown", iniciarMusica, { once: true });
             reiniciarJugador();
             break;
     }
@@ -584,5 +602,14 @@ function cambiarMapa(numeroMapa) {
 }
 if (mapaN==1){
     cambiarMapa(mapaN)
+}
+window.addEventListener("keydown", iniciarMusica, { once: true });
+function iniciarMusica() {
+    musicaFondo.play();
+    if (flag){
+        good.currentTime=0;
+        good.play();
+        musicaFondo.pause();
+    }
 }
 loop();
