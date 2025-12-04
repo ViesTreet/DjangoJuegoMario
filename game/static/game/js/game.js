@@ -17,6 +17,8 @@ const hongoImg = new Image();
 hongoImg.src = "/static/game/img/Mushroom.png";
 const enemy = new Image();
 enemy.src = "/static/game/img/enemy.png";
+const vidasLogo = new Image();
+vidasLogo.src = "/static/game/img/vida.png";
 let spawnX = 50;
 let spawnY = 300;
 let mapaN=1;
@@ -283,7 +285,9 @@ function moverJugador(paredes,irrompible,lava) {
         if (colision(rect, prect)) {
             const lado = detectarColisionLados(rect, prect);
             if (lado != null){
-                jugador.vidas -=1;
+                if(!modoDestruccion){
+                    jugador.vidas -=1;
+                }
                 reiniciarJugador();
             }
         }   
@@ -337,12 +341,13 @@ function verificarHongo() {
     if (colision(jr, hr)) {
         hongo.vivo = false;
         jugador.img = personajeHigh;
-        jugador.speed = 8;
+        jugador.speed +=2;
         modoDestruccion = true;
         tiempoInicio = Date.now();
         
-        jugador.fuerzaSalto = -15;
-        jugador.gravedad = 0.6;
+        jugador.fuerzaSalto -=2;
+        jugador.gravedad = 0.8;
+        vidasLogo.src = "/static/game/img/vidagold.png";
     }
 }
 
@@ -354,10 +359,16 @@ function actualizarModoDestruccion() {
     if (elapsed >= tiempoDestruir) {
         modoDestruccion = false;
         jugador.img = personaje;
-        jugador.speed = 5;
-        jugador.fuerzaSalto = personajeNombre === "mario" ? -18 : -15;
+        jugador.speed =4;
+        if (personajeNombre === "mario") {
+            jugador.speed = 5;
+        } else {
+            tiempoDestruir += 2;
+        }
+        jugador.fuerzaSalto = -12;
         jugador.gravedad = 0.8;
         tiempoTermino = true;
+        vidasLogo.src = "/static/game/img/vida.png";
     }
 }
 
@@ -387,6 +398,9 @@ function draw(paredes) {
         ctx.drawImage(hongoImg, hongo.x1, hongo.y1, hongo.w, hongo.h);
     }
 
+    for (let i = 0; i < jugador.vidas; i++){
+        ctx.drawImage(vidasLogo,(1100+(i*30)),20,20,20);
+    } 
     
     ctx.drawImage(jugador.img, jugador.x, jugador.y, jugador.w, jugador.h);
 }
@@ -414,6 +428,7 @@ function reiniciarMapa() {
         tiempoDestruir += 2;
     }
     mapaN=1;
+    vidasLogo.src = "/static/game/img/vida.png";
     cambiarMapa(mapaN);
 }
 
@@ -459,7 +474,6 @@ function actualizarEnemigos() {
             const stompMargin = 6;
             const jugadorBottom = jugador.y + jugador.h;
 
-            // Stomp si viene cayendo de arriba
             if (modoDestruccion) {
                 en.vivo = false;
                 jugador.velY = jugador.fuerzaSalto / 2;
@@ -507,7 +521,7 @@ function cambiarMapa(numeroMapa) {
     switch(numeroMapa) {
         case 1:
             paredesActuales = [...mapa1];
-            hongo = { x1: 400, y1: 150, w: 50, h: 50, vivo: true };
+            hongo = { x1: 1150, y1: 300-40, w: 50, h: 50, vivo: true };
             spawnX = 50; spawnY = 300;
             enemigos = [
                 { x0: 900, x: 900, y: 300-30, w: 30, h: 30, img: enemy, mov: 200, vivo: true, speed: 1,dir: 1 }

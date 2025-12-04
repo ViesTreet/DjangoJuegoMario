@@ -19,8 +19,10 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.urls import include, path
 from game.views import game_view, selector
+from django.shortcuts import redirect
 
 urlpatterns = [
+    path('', lambda request: redirect('/game', permanent=False)),
     path('admin/', admin.site.urls),
     path('api/', include('backend.urls')),
     path('game/', selector, name='game_selector'),
