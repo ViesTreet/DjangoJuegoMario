@@ -570,7 +570,7 @@ function cambiarMapa(numeroMapa) {
             break;
         default:
             paredesActuales = [...mapa1];
-            hongo = { x1: 400, y1: 150, w: 50, h: 50, vivo: true };
+            hongo = { x1: 1150, y1: 300-40, w: 50, h: 50, vivo: true };
             spawnX = 50; spawnY = 300;
             enemigos = [
                 { x0: 900, x: 900, y: 300-30, w: 30, h: 30, img: enemy, mov: 200, vivo: true, speed: 1,dir: 1 }
